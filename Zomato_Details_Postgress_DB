@@ -1,0 +1,45 @@
+import psycopg2
+import pandas as pd
+
+# Data set of Zomato
+data=pd.read_csv(r'zomato.csv',encoding='latin-1')
+
+
+# connection establishment
+
+conn = psycopg2.connect( database="Zomato_DB",user = "postgres", password = "root", host = "127.0.0.1", port = "5432")
+conn.autocommit = True
+
+# Creating a cursor object
+cursor = conn.cursor()
+
+# # query to create a database
+# sql = ''' CREATE database Zomato_DB ''';
+
+# # executing above query
+# cursor.execute(sql)
+# print("Database has been created successfully !!");
+
+#creating Table
+cursor.execute('''CREATE TABLE Zomato
+      (
+      Name      VARCHAR(100) NOT NULL,
+      city VARCHAR(100)  NOT NULL,
+      rating     INT     NOT NULL,
+      votes     INT     NOT NULL
+      );''')
+print('Table got created successfully')
+
+def details(data):
+    for i in range(len(data["Restaurant Name"])): 
+        name=data["Restaurant Name"][i]
+        city=data['City'][i]
+        rating=data['Aggregate rating'][i]
+        votes=data['Votes'][i]
+        cursor.execute("INSERT INTO Zomato (Name,City,Rating,Votes) VALUES('{}','{}',{},{})".format(name,city,rating,votes))
+        print("Records created successfully");
+details(data)
+
+# Closing the connection
+conn.commit()
+conn.close()
